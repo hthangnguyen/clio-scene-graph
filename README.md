@@ -36,6 +36,45 @@ The key innovation: instead of clustering objects by similarity alone, AIB clust
 
 ---
 
+
+## Environment
+
+- **Python**: 3.9.23
+- **OS**: Ubuntu 24.04 (WSL on Windows)
+- **GPU**: Not required (CPU-only)
+- **Key dependencies**: torch, clip, networkx, gradio, scipy, numpy, matplotlib
+---
+## Files
+
+```
+task-scene-graph/
+├── README.md                          # This file
+├── requirements.txt                   # Python dependencies
+├── .gitignore                         # Git ignore rules
+├── src/
+│   ├── __init__.py
+│   ├── scene_graph.py                 # Scene graph loading and spatial adjacency
+│   ├── embeddings.py                  # CLIP text embeddings with caching
+│   ├── information.py                 # Information-theoretic functions
+│   ├── clustering.py                  # AIB clustering loop
+│   └── baseline.py                    # Clio-Prim threshold baseline
+├── demo/
+│   ├── __init__.py
+│   └── app.py                         # Gradio interactive demo
+├── experiments/
+│   ├── __init__.py
+│   ├── run_ablation.py                # Ablation study script
+│   └── results/                       # Generated plots and CSV
+├── tests/
+│   ├── __init__.py
+│   ├── test_sanity.py                 # Phase 1-2 sanity tests
+│   ├── test_embeddings.py             # Phase 2 embedding tests
+│   └── test_demo.py                   # Phase 4 demo integration test
+└── data/
+    └── scenes/                        # 3RScan data (gitignored)
+```
+
+---
 ## Quick Start
 
 ### 1. Install dependencies
@@ -64,36 +103,6 @@ python tests/test_sanity.py
 python tests/test_embeddings.py
 python tests/test_demo.py
 ```
-
----
-
-## Architecture
-
-### Phase 1: Scene Graph Loading
-- **`src/scene_graph.py`**: Parse 3RScan semseg.v2.json, build spatial adjacency graph
-- **Input**: JSON file with object bounding boxes and labels
-- **Output**: SceneGraph object with nodes, edges, neighbor queries
-
-### Phase 2: CLIP Embeddings
-- **`src/embeddings.py`**: Compute text embeddings for objects and tasks
-- **Caching**: Task/alpha-aware cache prevents stale results
-- **Output**: Unit-normalized 512-d vectors for all nodes and tasks
-
-### Phase 3: Information Bottleneck Core
-- **`src/information.py`**: Compute task relevance, conditional distributions, mutual information
-- **`src/clustering.py`**: AIB loop with lazy merge weight updates
-- **`src/baseline.py`**: Clio-Prim threshold baseline for comparison
-- **Output**: Partition of nodes into task-relevant clusters + irrelevant singletons
-
-### Phase 4: Interactive Demo
-- **`demo/app.py`**: Gradio UI with scene selector, task input, tau/alpha sliders
-- **Visualization**: Graph with color-coded clusters, cluster table, statistics
-- **Output**: Real-time clustering results with comparison to baseline
-
-### Phase 5: Ablation Studies
-- **`experiments/run_ablation.py`**: Compare AIB vs baseline across scenes, tasks, tau values
-- **Metrics**: Compression ratio, task coverage, node retention
-- **Output**: CSV table and comparison plots
 
 ---
 
@@ -251,46 +260,6 @@ If you use this implementation, please cite the Clio paper:
 
 ---
 
-## Files
-
-```
-task-scene-graph/
-├── README.md                          # This file
-├── requirements.txt                   # Python dependencies
-├── .gitignore                         # Git ignore rules
-├── src/
-│   ├── __init__.py
-│   ├── scene_graph.py                 # Scene graph loading and spatial adjacency
-│   ├── embeddings.py                  # CLIP text embeddings with caching
-│   ├── information.py                 # Information-theoretic functions
-│   ├── clustering.py                  # AIB clustering loop
-│   └── baseline.py                    # Clio-Prim threshold baseline
-├── demo/
-│   ├── __init__.py
-│   └── app.py                         # Gradio interactive demo
-├── experiments/
-│   ├── __init__.py
-│   ├── run_ablation.py                # Ablation study script
-│   └── results/                       # Generated plots and CSV
-├── tests/
-│   ├── __init__.py
-│   ├── test_sanity.py                 # Phase 1-2 sanity tests
-│   ├── test_embeddings.py             # Phase 2 embedding tests
-│   └── test_demo.py                   # Phase 4 demo integration test
-└── data/
-    └── scenes/                        # 3RScan data (gitignored)
-```
-
----
-
-## Environment
-
-- **Python**: 3.9.23
-- **OS**: Ubuntu 24.04 (WSL on Windows)
-- **GPU**: Not required (CPU-only)
-- **Key dependencies**: torch, clip, networkx, gradio, scipy, numpy, matplotlib
-
----
 
 ## License
 
