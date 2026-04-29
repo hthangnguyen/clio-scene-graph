@@ -16,10 +16,10 @@ This project implements **Agglomerative Information Bottleneck (AIB)** clusterin
 The key innovation: instead of clustering objects by similarity alone, AIB clusters objects by their **information content relative to a task**. Objects that are equally irrelevant to a task are merged together, while task-relevant objects are preserved in separate clusters.
 
 **Mathematical foundation:**
-- Task relevance: θ(x_i) = cosine similarity between object and task embeddings
-- Conditional distribution: p(y|x_i) = probability of task relevance given object
-- Information loss: δ(k) = (I(X_{k-1}; Y) - I(X_k; Y)) / I(X_0; Y)
-- Stopping criterion: merge until δ(k) > τ (information loss threshold)
+- **Task Relevance**: θ(xᵢ) = cosine_similarity(object_embedding, task_embedding)
+- **Conditional Distribution**: p(y | xᵢ) = probability of task relevance given object xᵢ
+- **Information Loss**: δ(k) = (I(Xₖ₋₁; Y) − I(Xₖ; Y)) / I(X₀; Y)
+- **Stopping criterion**: merge until δ(k) > τ (information loss threshold)
 
 ---
 
@@ -99,31 +99,55 @@ python tests/test_demo.py
 
 ## Key Formulas
 
-### Task Relevance Vector θ(x_i)
-```
-θ(x_i)[0]   = α                                    (null task score)
-θ(x_i)[j]   = cos_sim(f_xi, f_tj)  for j=1..m    (task similarities)
-```
+### Task Relevance Vector $\\theta(x_i)$
 
-### Conditional Distribution p(y|x_i)
-```
-IF max(θ[1:]) < α:
-    p(y|x_i) = [1.0, 0, ..., 0]                   (irrelevant)
-ELSE:
-    p(y|x_i) = softmax(top-l task similarities)   (relevant)
-    p[0] = 0.0 (binary invariant)
-```
+$$
+\\theta(x_i)_0 = \\alpha \\quad \\text{(null task score)}
+$$
 
-### Merge Weight d_ij
-```
-d_ij = (p(x_i) + p(x_j)) × JS(p(y|x_i), p(y|x_j))
-```
+$$
+\\theta(x_i)_j = \\cos\\big(f_{x_i}, f_{t_j}\\big), \\quad j = 1, \\dots, m
+$$
 
-### Information Loss δ(k)
-```
-δ(k) = (I(X_{k-1}; Y) - I(X_k; Y)) / I(X_0; Y)
-Stop when δ(k) > τ
-```
+---
+
+### Conditional Distribution $p(y \\mid x_i)$
+
+$$
+\\text{If } \\max(\\theta(x_i)_{1:m}) < \\alpha:
+$$
+
+$$
+p(y \\mid x_i) = [1, 0, \\dots, 0]
+$$
+
+$$
+\\text{else:}
+$$
+
+$$
+p(y \\mid x_i) = \\text{softmax}(\\text{top-}l\\; \\theta(x_i)_{1:m}), \\quad p_0 = 0
+$$
+
+---
+
+### Merge Weight $d_{ij}$
+
+$$
+d_{ij} = \\big(p(x_i) + p(x_j)\\big) \\cdot \\mathrm{JS}\\big(p(y \\mid x_i), p(y \\mid x_j)\\big)
+$$
+
+---
+
+### Information Loss $\\delta(k)$
+
+$$
+\\delta(k) = \\frac{I(X_{k-1}; Y) - I(X_k; Y)}{I(X_0; Y)}
+$$
+
+$$
+\\text{Stop when } \\delta(k) > \\tau
+$$
 
 ---
 
